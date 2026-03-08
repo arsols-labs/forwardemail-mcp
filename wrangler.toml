@@ -1,0 +1,12 @@
+name = "forwardemail-mcp"
+main = "dist/cf-worker.js"
+compatibility_date = "2024-11-01"
+compatibility_flags = ["nodejs_compat", "no_handle_cross_request_promise_resolution"]
+
+[vars]
+MCP_TRANSPORT = "http"
+
+[observability]
+[observability.logs]
+enabled = true
+invocation_logs = true
