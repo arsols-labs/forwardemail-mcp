@@ -238,7 +238,7 @@ async function getOnePasswordClient(source: ConfigSource): Promise<OnePasswordSe
     return createClient({
       auth: token,
       integrationName: "forwardemail-mcp",
-      integrationVersion: "v0.0.0"
+      integrationVersion: "v0.1.0"
     });
   })();
 

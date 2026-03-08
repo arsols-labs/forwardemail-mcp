@@ -2,6 +2,13 @@
 
 `forwardemail-mcp` is an MCP server for Forward Email workflows. It exposes mail, calendar, and contacts tools over local `stdio` for development and Streamable HTTP for remote clients such as Notion Custom Agents.
 
+The default configuration targets the public Forward Email service. If you run a self-hosted setup, override the service URLs in your environment.
+
+Versioning:
+
+- Releases use semver tags and GitHub Releases.
+- The first public release target is `v0.1.0`.
+
 Auth model:
 
 - `FE_ALIAS_USER` + `FE_ALIAS_PASS` + DAV URLs power mailbox, calendar, and contacts tools.
@@ -18,25 +25,31 @@ Auth model:
 
 ## Local Stdio Quickstart
 
-1. Install dependencies:
+1. To pin the first public release once tags are available:
+
+```bash
+git checkout v0.1.0
+```
+
+2. Install dependencies:
 
 ```bash
 npm install
 ```
 
-2. Create local config from the example and fill in real values:
+3. Create local config from the example and fill in real values:
 
 ```bash
 cp .env.example .env
 ```
 
-3. Build the server:
+4. Build the server:
 
 ```bash
 npm run build
 ```
 
-4. Point your MCP client at the built entrypoint. Example:
+5. Point your MCP client at the built entrypoint. Example:
 
 ```json
 {
@@ -47,10 +60,10 @@ npm run build
       "env": {
         "MCP_TRANSPORT": "stdio",
         "LOG_LEVEL": "info",
-        "FE_API_URL": "https://api.example.com",
+        "FE_API_URL": "https://api.forwardemail.net",
         "FE_API_KEY": "replace-with-api-key",
-        "FE_CALDAV_URL": "https://caldav.example.com/dav",
-        "FE_CARDDAV_URL": "https://carddav.example.com/dav",
+        "FE_CALDAV_URL": "https://caldav.forwardemail.net",
+        "FE_CARDDAV_URL": "https://carddav.forwardemail.net",
         "FE_ALIAS_USER": "alias@example.com",
         "FE_ALIAS_PASS": "replace-with-alias-password"
       }
@@ -60,6 +73,29 @@ npm run build
 ```
 
 `MCP_TRANSPORT=stdio` is the default, so `npm run dev` also works for local iteration.
+
+## Optional: 1Password SDK Mode
+
+The runtime also supports resolving secrets directly from 1Password via the 1Password SDK.
+
+1. Set `AUTH_MODE=1password-sdk`.
+2. Export `OP_SERVICE_ACCOUNT_TOKEN`.
+3. Replace credential values with `op://vault/item/field` or `op://vault/item/section/field` references.
+
+Example:
+
+```dotenv
+AUTH_MODE=1password-sdk
+OP_SERVICE_ACCOUNT_TOKEN=ops_xxx
+FE_API_URL=op://vault/forwardemail/api-url
+FE_API_KEY=op://vault/forwardemail/api-key
+FE_CALDAV_URL=op://vault/forwardemail/caldav-url
+FE_CARDDAV_URL=op://vault/forwardemail/carddav-url
+FE_ALIAS_USER=op://vault/forwardemail/alias-user
+FE_ALIAS_PASS=op://vault/forwardemail/alias-pass
+```
+
+If `AUTH_MODE=env`, the server reads the plain environment variables instead.
 
 ## Cloudflare Workers Deploy
 

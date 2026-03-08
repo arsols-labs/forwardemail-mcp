@@ -10,7 +10,7 @@ import { registerContactsTools } from "../tools/contacts-tools.js";
 import { registerEmailTools } from "../tools/email-tools.js";
 
 export const MCP_SERVER_NAME = "forwardemail-mcp";
-export const MCP_SERVER_VERSION = "0.0.0";
+export const MCP_SERVER_VERSION = "0.1.0";
 export const MCP_TOOL_COUNT = 14;
 
 export async function loadMcpConfig(source?: ConfigSource): Promise<AppConfig> {
