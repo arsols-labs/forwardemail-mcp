@@ -2,6 +2,8 @@
 
 `forwardemail-mcp` is an MCP server for Forward Email workflows. It exposes mail, calendar, and contacts tools over local `stdio` for development and Streamable HTTP for remote clients such as Notion Custom Agents.
 
+The default configuration targets the public Forward Email service. If you run a self-hosted setup, override the service URLs in your environment.
+
 Auth model:
 
 - `FE_ALIAS_USER` + `FE_ALIAS_PASS` + DAV URLs power mailbox, calendar, and contacts tools.
@@ -47,10 +49,10 @@ npm run build
       "env": {
         "MCP_TRANSPORT": "stdio",
         "LOG_LEVEL": "info",
-        "FE_API_URL": "https://api.example.com",
+        "FE_API_URL": "https://api.forwardemail.net",
         "FE_API_KEY": "replace-with-api-key",
-        "FE_CALDAV_URL": "https://caldav.example.com/dav",
-        "FE_CARDDAV_URL": "https://carddav.example.com/dav",
+        "FE_CALDAV_URL": "https://caldav.forwardemail.net",
+        "FE_CARDDAV_URL": "https://carddav.forwardemail.net",
         "FE_ALIAS_USER": "alias@example.com",
         "FE_ALIAS_PASS": "replace-with-alias-password"
       }
