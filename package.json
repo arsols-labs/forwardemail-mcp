@@ -1,0 +1,38 @@
+{
+  "name": "forwardemail-mcp",
+  "version": "0.0.0",
+  "description": "MCP server for Forward Email mail, calendar, and contacts workflows",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "cf:deploy": "npm run build && wrangler deploy",
+    "cf:deploy:dry": "npm run build && wrangler deploy --dry-run",
+    "cf:dev": "npm run build && wrangler dev"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "forward-email",
+    "notion",
+    "cloudflare-workers"
+  ],
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "@1password/sdk": "^0.4.0",
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "imapflow": "^1.2.11",
+    "tsdav": "^2.1.8",
+    "undici": "^7.22.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.3",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.70.0"
+  }
+}

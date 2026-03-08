@@ -1,0 +1,14 @@
+.DS_Store
+
+AGENTS.md
+.codex/
+
+node_modules/
+dist/
+coverage/
+.wrangler/
+.wrangler-home/
+
+.env
+.env.*
+!.env.example
