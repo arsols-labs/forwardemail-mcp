@@ -31,25 +31,31 @@ Auth model:
 git checkout v0.1.0
 ```
 
-2. Install dependencies:
+2. Use Node `20.18.1` or newer. The repo pins `20.18.1` in `.nvmrc` and requires at least that version in `package.json`.
+
+```bash
+nvm use
+```
+
+3. Install dependencies:
 
 ```bash
 npm install
 ```
 
-3. Create local config from the example and fill in real values:
+4. Create local config from the example and fill in real values:
 
 ```bash
 cp .env.example .env
 ```
 
-4. Build the server:
+5. Build the server:
 
 ```bash
 npm run build
 ```
 
-5. Point your MCP client at the built entrypoint. Example:
+6. Point your MCP client at the built entrypoint. Example:
 
 ```json
 {
@@ -99,13 +105,19 @@ If `AUTH_MODE=env`, the server reads the plain environment variables instead.
 
 ## Cloudflare Workers Deploy
 
-1. Build the worker bundle:
+1. Use Node `20.18.1` or newer before packaging or deploying the worker.
+
+```bash
+nvm use
+```
+
+2. Build the worker bundle:
 
 ```bash
 npm run build
 ```
 
-2. Set worker secrets:
+3. Set worker secrets:
 
 ```bash
 wrangler secret put FE_API_URL
@@ -117,13 +129,19 @@ wrangler secret put FE_ALIAS_PASS
 wrangler secret put MCP_AUTH_TOKEN
 ```
 
-3. Deploy:
+4. Optionally verify the Cloudflare bundle locally without deploying:
+
+```bash
+npm run cf:deploy:dry
+```
+
+5. Deploy:
 
 ```bash
 npm run cf:deploy
 ```
 
-4. Use the deployed MCP endpoint at your worker URL plus `/mcp`. `GET /health` can stay public; `/mcp` should stay behind a bearer token.
+6. Use the deployed MCP endpoint at your worker URL plus `/mcp`. `GET /health` can stay public; `/mcp` should stay behind a bearer token.
 
 ## Connect to Notion Custom Agent
 

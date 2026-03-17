@@ -21,18 +21,21 @@
   "author": "",
   "license": "MIT",
   "type": "module",
+  "engines": {
+    "node": ">=20.18.1"
+  },
   "dependencies": {
     "@1password/sdk": "^0.4.0",
     "@modelcontextprotocol/sdk": "^1.27.1",
-    "imapflow": "^1.2.12",
+    "imapflow": "^1.2.14",
     "tsdav": "^2.1.8",
-    "undici": "^7.24.0",
+    "undici": "^7.24.3",
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@types/node": "^25.3.5",
+    "@types/node": "^25.5.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "wrangler": "^4.71.0"
+    "wrangler": "^4.73.0"
   }
 }
