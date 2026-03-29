@@ -5,11 +5,13 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
 
+import { logStructured } from "../services/logger.js";
 import { createConfiguredMcpServer, loadMcpConfig, MCP_TOOL_COUNT } from "./mcp-server.js";
 
 const DEFAULT_MCP_PORT = 3100;
 const MCP_PATH = "/mcp";
 const HEALTH_PATH = "/health";
+const INTERNAL_SERVER_ERROR_MESSAGE = "Internal server error.";
 
 interface SessionState {
   server: McpServer;
@@ -203,8 +205,21 @@ export async function startMcpHttpServer(): Promise<void> {
 
       jsonRpcError(res, 405, `Method ${method ?? "UNKNOWN"} is not allowed for ${MCP_PATH}.`);
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      jsonRpcError(res, 500, `Internal server error: ${message}`);
+      const normalizedError = error instanceof Error ? error : new Error(String(error));
+      logStructured("mcp_http", "error", "request_error", {
+        timestamp: new Date().toISOString(),
+        method,
+        pathname,
+        errorName: normalizedError.name,
+        errorMessage: normalizedError.message
+      });
+      logStructured("mcp_http", "debug", "request_error_debug", {
+        timestamp: new Date().toISOString(),
+        method,
+        pathname,
+        errorStack: normalizedError.stack
+      });
+      jsonRpcError(res, 500, INTERNAL_SERVER_ERROR_MESSAGE);
     }
   });
 

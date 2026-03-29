@@ -10,6 +10,7 @@ const LEGACY_SSE_MESSAGE_PATH = "/message";
 const HEALTH_PATH = "/health";
 const STREAMABLE_PATH_ALIASES = new Set([MCP_PATH, LEGACY_SSE_PATH]);
 const BEARER_PREFIX = "Bearer ";
+const INTERNAL_SERVER_ERROR_MESSAGE = "Internal server error.";
 const CORS_HEADERS: Readonly<Record<string, string>> = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
@@ -228,7 +229,6 @@ export default {
 
       return jsonResponse(404, { error: "Not found" });
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
       const normalizedError = error instanceof Error ? error : new Error(String(error));
       logStructured("cf_worker", "error", "request_error", {
         timestamp: new Date().toISOString(),
@@ -243,7 +243,7 @@ export default {
         pathname,
         errorStack: normalizedError.stack
       });
-      return jsonRpcError(500, `Internal server error: ${message}`);
+      return jsonRpcError(500, INTERNAL_SERVER_ERROR_MESSAGE);
     }
   }
 };
