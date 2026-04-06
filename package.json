@@ -26,14 +26,14 @@
   },
   "dependencies": {
     "@1password/sdk": "^0.4.0",
-    "@modelcontextprotocol/sdk": "^1.27.1",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "tsdav": "^2.1.8",
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@types/node": "^25.5.0",
+    "@types/node": "^25.5.2",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3",
-    "wrangler": "^4.76.0"
+    "typescript": "^6.0.2",
+    "wrangler": "^4.80.0"
   }
 }
