@@ -1,6 +1,6 @@
 {
   "name": "forwardemail-mcp",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "MCP server for Forward Email mail, calendar, and contacts workflows",
   "main": "dist/index.js",
   "scripts": {
