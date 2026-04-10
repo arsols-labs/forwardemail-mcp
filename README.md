@@ -7,7 +7,7 @@ The default configuration targets the public Forward Email service. If you run a
 Versioning:
 
 - Releases use semver tags and GitHub Releases.
-- The first public release target is `v0.1.0`.
+- The current public release is `v0.1.2`.
 
 Auth model:
 
@@ -25,10 +25,10 @@ Auth model:
 
 ## Local Stdio Quickstart
 
-1. To pin the first public release once tags are available:
+1. To pin the current public release:
 
 ```bash
-git checkout v0.1.0
+git checkout v0.1.2
 ```
 
 2. Use Node `20.18.1` or newer. The repo pins `20.18.1` in `.nvmrc` and requires at least that version in `package.json`.
