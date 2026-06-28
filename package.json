@@ -27,13 +27,13 @@
   "dependencies": {
     "@1password/sdk": "^0.4.0",
     "@modelcontextprotocol/sdk": "^1.27.1",
-    "tsdav": "^2.2.2",
+    "tsdav": "^2.3.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@types/node": "^25.9.1",
-    "tsx": "^4.22.3",
+    "@types/node": "^26.0.1",
+    "tsx": "^4.22.4",
     "typescript": "^6.0.3",
-    "wrangler": "^4.103.0"
+    "wrangler": "^4.105.0"
   }
 }
