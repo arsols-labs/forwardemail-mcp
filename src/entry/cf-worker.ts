@@ -2,6 +2,7 @@ import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/
 
 import { type AppConfig, type ConfigSource } from "../services/auth.js";
 import { logStructured } from "../services/logger.js";
+import { isBearerTokenAuthorized } from "./http-auth.js";
 import { createConfiguredMcpServer, loadMcpConfig, MCP_TOOL_COUNT } from "./mcp-server.js";
 
 const MCP_PATH = "/mcp";
@@ -9,14 +10,12 @@ const LEGACY_SSE_PATH = "/sse";
 const LEGACY_SSE_MESSAGE_PATH = "/message";
 const HEALTH_PATH = "/health";
 const STREAMABLE_PATH_ALIASES = new Set([MCP_PATH, LEGACY_SSE_PATH]);
-const BEARER_PREFIX = "Bearer ";
 const INTERNAL_SERVER_ERROR_MESSAGE = "Internal server error.";
 const CORS_HEADERS: Readonly<Record<string, string>> = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
   "Access-Control-Allow-Headers": "Authorization, Content-Type, mcp-session-id"
 };
-const textEncoder = new TextEncoder();
 
 interface WorkerEnv extends ConfigSource {
   MCP_TRANSPORT?: string;
@@ -99,38 +98,10 @@ function noContentResponse(statusCode: number): Response {
   });
 }
 
-function extractBearerToken(request: Request): string | undefined {
-  const authorization = request.headers.get("authorization");
-  if (!authorization?.startsWith(BEARER_PREFIX)) {
-    return undefined;
-  }
-
-  const token = authorization.slice(BEARER_PREFIX.length).trim();
-  return token || undefined;
-}
-
-function timingSafeTokenEqual(left: string, right: string): boolean {
-  const leftBytes = textEncoder.encode(left);
-  const rightBytes = textEncoder.encode(right);
-  const maxLength = Math.max(leftBytes.length, rightBytes.length);
-
-  let diff = leftBytes.length ^ rightBytes.length;
-  for (let index = 0; index < maxLength; index += 1) {
-    diff |= (leftBytes[index] ?? 0) ^ (rightBytes[index] ?? 0);
-  }
-
-  return diff === 0;
-}
-
 function isAuthorizedRequest(request: Request, env: WorkerEnv): boolean {
   const expectedToken = env.MCP_AUTH_TOKEN?.trim();
-  const providedToken = extractBearerToken(request);
-
-  if (!expectedToken || !providedToken) {
-    return false;
-  }
-
-  return timingSafeTokenEqual(providedToken, expectedToken);
+  return expectedToken !== undefined && expectedToken !== "" &&
+    isBearerTokenAuthorized(request.headers.get("authorization"), expectedToken);
 }
 
 function isLegacySseRequest(pathname: string): boolean {

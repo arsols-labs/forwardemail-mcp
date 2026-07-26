@@ -1,11 +1,19 @@
 import { randomUUID } from "node:crypto";
-import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
+import {
+  createServer,
+  type IncomingMessage,
+  type RequestListener,
+  type Server,
+  type ServerResponse
+} from "node:http";
 
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
 
+import type { AppConfig } from "../services/auth.js";
 import { logStructured } from "../services/logger.js";
+import { isBearerTokenAuthorized, requireMcpAuthToken } from "./http-auth.js";
 import { createConfiguredMcpServer, loadMcpConfig, MCP_TOOL_COUNT } from "./mcp-server.js";
 
 const DEFAULT_MCP_PORT = 3100;
@@ -113,11 +121,8 @@ async function closeAllSessions(): Promise<void> {
   await Promise.all(activeSessions.map((sessionId) => closeSession(sessionId)));
 }
 
-export async function startMcpHttpServer(): Promise<void> {
-  const config = await loadMcpConfig();
-  const port = parsePort(process.env.MCP_PORT);
-
-  const server: Server = createServer(async (req, res) => {
+export function createMcpHttpRequestHandler(config: AppConfig, authToken: string): RequestListener {
+  return async (req, res) => {
     const method = req.method?.toUpperCase();
     const pathname = getPathname(req);
 
@@ -128,6 +133,14 @@ export async function startMcpHttpServer(): Promise<void> {
 
     if (pathname !== MCP_PATH) {
       jsonResponse(res, 404, { error: "Not found" });
+      return;
+    }
+
+    const authorization = Array.isArray(req.headers.authorization)
+      ? req.headers.authorization[0]
+      : req.headers.authorization;
+    if (!isBearerTokenAuthorized(authorization, authToken)) {
+      jsonResponse(res, 401, { error: "Unauthorized" });
       return;
     }
 
@@ -221,7 +234,14 @@ export async function startMcpHttpServer(): Promise<void> {
       });
       jsonRpcError(res, 500, INTERNAL_SERVER_ERROR_MESSAGE);
     }
-  });
+  };
+}
+
+export async function startMcpHttpServer(): Promise<void> {
+  const authToken = requireMcpAuthToken(process.env.MCP_AUTH_TOKEN);
+  const config = await loadMcpConfig();
+  const port = parsePort(process.env.MCP_PORT);
+  const server: Server = createServer(createMcpHttpRequestHandler(config, authToken));
 
   let isShuttingDown = false;
   const shutdown = async (signal: NodeJS.Signals): Promise<void> => {
