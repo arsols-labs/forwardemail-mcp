@@ -98,10 +98,10 @@ function noContentResponse(statusCode: number): Response {
   });
 }
 
-function isAuthorizedRequest(request: Request, env: WorkerEnv): boolean {
+async function isAuthorizedRequest(request: Request, env: WorkerEnv): Promise<boolean> {
   const expectedToken = env.MCP_AUTH_TOKEN?.trim();
   return expectedToken !== undefined && expectedToken !== "" &&
-    isBearerTokenAuthorized(request.headers.get("authorization"), expectedToken);
+    await isBearerTokenAuthorized(request.headers.get("authorization"), expectedToken);
 }
 
 function isLegacySseRequest(pathname: string): boolean {
@@ -172,7 +172,7 @@ export default {
       return jsonResponse(200, { status: "ok", tools: MCP_TOOL_COUNT });
     }
 
-    if (!isAuthorizedRequest(request, env)) {
+    if (!await isAuthorizedRequest(request, env)) {
       return jsonResponse(401, { error: "Unauthorized" });
     }
 

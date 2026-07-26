@@ -139,7 +139,7 @@ export function createMcpHttpRequestHandler(config: AppConfig, authToken: string
     const authorization = Array.isArray(req.headers.authorization)
       ? req.headers.authorization[0]
       : req.headers.authorization;
-    if (!isBearerTokenAuthorized(authorization, authToken)) {
+    if (!await isBearerTokenAuthorized(authorization, authToken)) {
       jsonResponse(res, 401, { error: "Unauthorized" });
       return;
     }

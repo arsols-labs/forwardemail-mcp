@@ -5,29 +5,47 @@ export function extractBearerToken(authorization: string | null | undefined): st
     return undefined;
   }
 
-  const match = authorization.match(/^Bearer[ \t]+([^ \t].*?)\s*$/i);
-  return match?.[1] || undefined;
+  const value = authorization.trim();
+  const schemeLength = "Bearer".length;
+  if (value.slice(0, schemeLength).toLowerCase() !== "bearer") {
+    return undefined;
+  }
+
+  let tokenStart = schemeLength;
+  if (value[tokenStart] !== " " && value[tokenStart] !== "\t") {
+    return undefined;
+  }
+
+  while (value[tokenStart] === " " || value[tokenStart] === "\t") {
+    tokenStart += 1;
+  }
+
+  const token = value.slice(tokenStart);
+  return token || undefined;
 }
 
-export function timingSafeTokenEqual(left: string, right: string): boolean {
-  const leftBytes = textEncoder.encode(left);
-  const rightBytes = textEncoder.encode(right);
-  const maxLength = Math.max(leftBytes.length, rightBytes.length);
+async function sha256(value: string): Promise<Uint8Array> {
+  const digest = await crypto.subtle.digest("SHA-256", textEncoder.encode(value));
+  return new Uint8Array(digest);
+}
 
-  let difference = leftBytes.length ^ rightBytes.length;
-  for (let index = 0; index < maxLength; index += 1) {
-    difference |= (leftBytes[index] ?? 0) ^ (rightBytes[index] ?? 0);
+export async function timingSafeTokenEqual(left: string, right: string): Promise<boolean> {
+  const [leftDigest, rightDigest] = await Promise.all([sha256(left), sha256(right)]);
+
+  let difference = 0;
+  for (let index = 0; index < leftDigest.length; index += 1) {
+    difference |= leftDigest[index] ^ rightDigest[index];
   }
 
   return difference === 0;
 }
 
-export function isBearerTokenAuthorized(
+export async function isBearerTokenAuthorized(
   authorization: string | null | undefined,
   expectedToken: string
-): boolean {
+): Promise<boolean> {
   const providedToken = extractBearerToken(authorization);
-  return providedToken !== undefined && timingSafeTokenEqual(providedToken, expectedToken);
+  return providedToken !== undefined && await timingSafeTokenEqual(providedToken, expectedToken);
 }
 
 export function requireMcpAuthToken(value: string | null | undefined): string {

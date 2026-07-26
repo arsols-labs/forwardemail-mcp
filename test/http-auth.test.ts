@@ -3,7 +3,11 @@ import { createServer } from "node:http";
 import test from "node:test";
 
 import worker from "../src/entry/cf-worker.js";
-import { extractBearerToken, requireMcpAuthToken } from "../src/entry/http-auth.js";
+import {
+  extractBearerToken,
+  requireMcpAuthToken,
+  timingSafeTokenEqual
+} from "../src/entry/http-auth.js";
 import { createMcpHttpRequestHandler } from "../src/entry/mcp-http.js";
 
 const env = { MCP_AUTH_TOKEN: "correct-token" };
@@ -89,4 +93,9 @@ test("shared bearer parsing and empty-token validation", () => {
   assert.equal(extractBearerToken("bearer token-value"), "token-value");
   assert.equal(extractBearerToken("Basic token-value"), undefined);
   assert.throws(() => requireMcpAuthToken("  "), /MCP_AUTH_TOKEN is required/);
+});
+
+test("shared token comparison hashes values to a fixed length", async () => {
+  assert.equal(await timingSafeTokenEqual("correct-token", "correct-token"), true);
+  assert.equal(await timingSafeTokenEqual("short", "a-much-longer-token"), false);
 });
