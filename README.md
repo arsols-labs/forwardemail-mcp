@@ -13,7 +13,7 @@ Auth model:
 
 - `FE_ALIAS_USER` + `FE_ALIAS_PASS` + DAV URLs power mailbox, calendar, and contacts tools.
 - `FE_API_KEY` is used for API-key-only actions such as sending mail.
-- `MCP_AUTH_TOKEN` protects the public `/mcp` endpoint when you deploy remotely.
+- `MCP_AUTH_TOKEN` is required for both Node.js and Cloudflare Worker HTTP entrypoints and protects `/mcp` with bearer authentication. `GET /health` remains public.
 
 ## What It Does
 
@@ -80,6 +80,11 @@ npm run build
 
 `MCP_TRANSPORT=stdio` is the default, so `npm run dev` also works for local iteration.
 
+For the Node.js Streamable HTTP entrypoint, set `MCP_TRANSPORT=http` and a non-empty
+`MCP_AUTH_TOKEN`. The process refuses to start if the token is missing or blank. MCP
+clients must send `Authorization: Bearer <MCP_AUTH_TOKEN>` to `/mcp`; `GET /health`
+does not require authentication.
+
 ## Optional: 1Password SDK Mode
 
 The runtime also supports resolving secrets directly from 1Password via the 1Password SDK.
@@ -141,7 +146,7 @@ npm run cf:deploy:dry
 npm run cf:deploy
 ```
 
-6. Use the deployed MCP endpoint at your worker URL plus `/mcp`. `GET /health` can stay public; `/mcp` should stay behind a bearer token.
+6. Use the deployed MCP endpoint at your worker URL plus `/mcp`. As with the Node.js HTTP entrypoint, `GET /health` is public and `/mcp` requires `Authorization: Bearer <MCP_AUTH_TOKEN>`.
 
 ## Connect to Notion Custom Agent
 
