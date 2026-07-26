@@ -2,20 +2,20 @@ import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import test from "node:test";
 
-import worker from "../src/entry/cf-worker.js";
+import worker from "../dist/entry/cf-worker.js";
 import {
   extractBearerToken,
   requireMcpAuthToken,
   timingSafeTokenEqual
-} from "../src/entry/http-auth.js";
-import { createMcpHttpRequestHandler } from "../src/entry/mcp-http.js";
+} from "../dist/entry/http-auth.js";
+import { createMcpHttpRequestHandler } from "../dist/entry/mcp-http.js";
 
 const env = { MCP_AUTH_TOKEN: "correct-token" };
-const config = { AUTH_MODE: "env" as const, LOG_LEVEL: "info" as const };
+const config = { AUTH_MODE: "env", LOG_LEVEL: "info" };
 
-async function withNodeHttpServer(run: (origin: string) => Promise<void>): Promise<void> {
+async function withNodeHttpServer(run) {
   const server = createServer(createMcpHttpRequestHandler(config, env.MCP_AUTH_TOKEN));
-  await new Promise<void>((resolve, reject) => {
+  await new Promise((resolve, reject) => {
     server.once("error", reject);
     server.listen(0, "127.0.0.1", resolve);
   });
@@ -25,7 +25,7 @@ async function withNodeHttpServer(run: (origin: string) => Promise<void>): Promi
     assert(address && typeof address !== "string");
     await run(`http://127.0.0.1:${address.port}`);
   } finally {
-    await new Promise<void>((resolve, reject) => {
+    await new Promise((resolve, reject) => {
       server.close((error) => error ? reject(error) : resolve());
     });
   }
@@ -60,7 +60,7 @@ test("Node HTTP /health remains public", async () => {
   await withNodeHttpServer(async (origin) => {
     const response = await fetch(`${origin}/health`);
     assert.equal(response.status, 200);
-    assert.equal((await response.json() as { status: string }).status, "ok");
+    assert.equal((await response.json()).status, "ok");
   });
 });
 
@@ -86,7 +86,7 @@ test("/mcp accepts the correct bearer token before routing the request", async (
 test("/health remains public", async () => {
   const response = await worker.fetch(new Request("https://example.test/health"), env);
   assert.equal(response.status, 200);
-  assert.equal((await response.json() as { status: string }).status, "ok");
+  assert.equal((await response.json()).status, "ok");
 });
 
 test("shared bearer parsing and empty-token validation", () => {
