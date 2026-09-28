@@ -1,3 +1,5 @@
+> **Archived.** On 2026-03-05, Forward Email published its official MCP server as [`@forwardemail/mcp-server`](https://github.com/forwardemail/mcp-server) (first release [v1.0.0](https://github.com/forwardemail/mcp-server/releases/tag/v1.0.0); [npm](https://www.npmjs.com/package/@forwardemail/mcp-server)). From that date, this project (`arsols-labs/forwardemail-mcp`) is superseded. It is being archived and will no longer receive feature or dependency updates. Prefer the official Forward Email MCP: [docs](https://forwardemail.net/blog/docs/mcp) and [forwardemail.net/mcp](https://forwardemail.net/mcp). The rest of this file is kept for historical reference. See also [ARCHIVED.md](ARCHIVED.md).
+
 # forwardemail-mcp
 
 `forwardemail-mcp` is an MCP server for Forward Email workflows. It exposes mail, calendar, and contacts tools over local `stdio` for development and Streamable HTTP for remote clients such as Notion Custom Agents.
